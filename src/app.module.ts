@@ -10,12 +10,15 @@ import { APP_PIPE } from '@nestjs/core';
   imports: [
     RecipeModule,
     IngredientModule,
-    MongooseModule.forRoot('mongodb://localhost/nest')
+    MongooseModule.forRoot('mongodb://localhost/nest'),
   ],
   controllers: [AppController],
-  providers: [AppService,  {
+  providers: [
+    AppService,
+    {
       provide: APP_PIPE,
       useClass: ValidationPipe,
-    }],
+    },
+  ],
 })
-export class AppModule { }
+export class AppModule {}
