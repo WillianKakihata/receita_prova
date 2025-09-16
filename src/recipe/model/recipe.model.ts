@@ -13,8 +13,8 @@ export class Recipe {
     @Prop()
     aproxim_cost: number;
 
-    @Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: 'Ingredient' }})
-    ingredientsId: Types.ObjectId[] |Ingredient[];
+    @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Ingredient', default: []})
+    ingredientsId: Types.ObjectId[];
 }   
 
 export const RecipeSchema = SchemaFactory.createForClass(Recipe);

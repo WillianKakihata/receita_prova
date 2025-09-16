@@ -22,48 +22,69 @@ export class RecipeService {
 
     public async findBy(field: string, value: string): Promise<Recipe> {
         try {
-            const item = await this.recipeRepository.findOne({ _id: value });
+            const item = await this.recipeRepository.findOne({ [field]: value });
             if (!item) {
                 throw new NotFoundException(`item with ${field} = ${value} not found`);
             }
             return item;
         } catch (error) {
-            throw new error;
+            throw new BadRequestException(error);
         }
     }
 
     public async update(id: string, updateItem: Recipe) {
-        return await this.recipeRepository.findByIdAndUpdate(id, updateItem, {
-            new: true
-        });
+        try {
+            return await this.recipeRepository.findByIdAndUpdate(id, updateItem, {
+                new: true
+            });
+        } catch (error) {
+            throw new BadRequestException(error);
+        }
     }
 
     public async delete(id: string) {
-        return await this.recipeRepository.findByIdAndDelete(id, {
-            new: true
-        });
+        try {
+            const recipe = await this.findBy('_id', id)
+            if (!recipe) {
+                new NotFoundException('id not found')
+            }
+            await this.IngredientService.deleteMany(recipe.ingredientsId)
+            return await this.recipeRepository.findByIdAndDelete(id, {
+                new: true
+            });
+        } catch (error) {
+            throw new BadRequestException(error);
+        }
     }
 
     public async addIngredients(id: string, idIngredient: string) {
-        await this.IngredientService.receiveIdRecipe(idIngredient, id)
-        const ingredient = await this.recipeRepository.findByIdAndUpdate(
-            id, {
-            $push: { ingredientsId: new Types.ObjectId(idIngredient) },
-            new: true
-        })
-        await this.IngredientService.receiveIdRecipe(idIngredient, id)
-        return ingredient;
+        try {
+            await this.IngredientService.receiveIdRecipe(idIngredient, id);
+            return await this.recipeRepository.findByIdAndUpdate(
+                id,
+                { $push: { ingredientsId: new Types.ObjectId(idIngredient) } },
+                { new: true }
+            );
+        } catch (error) {
+            throw new BadRequestException(error);
+        }
     }
 
     public async removeIngredients(id: string, idIngredient: string) {
-        await this.IngredientService.removeIdRecipe(idIngredient, id)
-        const remove = await this.recipeRepository.findByIdAndUpdate(
-            id, {
-            $pull: { ingredientsId: new Types.ObjectId(idIngredient) },
-            new: true,
-            safe: true,
-            multi: false
-        })
-        return remove;
+        try {
+            await this.IngredientService.removeIdRecipe(idIngredient)
+            const remove = await this.recipeRepository.findByIdAndUpdate(
+                id, {
+                $pull: { ingredientsId: new Types.ObjectId(idIngredient) },
+                safe: true,
+                multi: false,
+                new: true
+            })
+            return remove;
+        } catch (error) {
+            throw new BadRequestException(error);
+        }
     }
+
+    
 }
