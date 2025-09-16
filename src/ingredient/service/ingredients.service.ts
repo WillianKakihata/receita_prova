@@ -65,7 +65,9 @@ export class IngredientService {
     public async delete(id: string) {
         try {
             const recipe = await this.ingredientRepository.findById(id);
-            await this.removeIngredients(recipe.recipe._id.toString(), id)
+            if (recipe.recipe != null) {
+                await this.removeIngredients(recipe.recipe._id.toString(), id)
+            }
             return await this.ingredientRepository.findByIdAndDelete(id, {
                 new: true
             });
@@ -115,7 +117,7 @@ export class IngredientService {
         try {
             return await this.ingredientRepository.findByIdAndUpdate(
                 id, {
-                $set: { recipe: null } ,
+                $set: { recipe: null },
                 new: true,
             })
         } catch (error) {
