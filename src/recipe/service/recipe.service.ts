@@ -64,5 +64,6 @@ export class RecipeService {
             safe: true,
             multi: false
         })
+        return remove;
     }
 }
