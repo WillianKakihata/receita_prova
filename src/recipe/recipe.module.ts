@@ -3,9 +3,12 @@ import { RecipeService } from "./service/recipe.service";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Recipe, RecipeSchema } from "./model/recipe.model";
 import { RecipeController } from "./controller/recipe.controller";
+import { IngredientService } from "src/ingredient/service/ingredients.service";
+import { IngredientModule } from "src/ingredient/ingredient.module";
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Recipe.name, schema: RecipeSchema }])],
+  imports: [IngredientModule,
+    MongooseModule.forFeature([{ name: Recipe.name, schema: RecipeSchema }])],
   controllers: [RecipeController],
   providers: [RecipeService],
 })

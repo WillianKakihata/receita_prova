@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Ingredient } from "../model/ingredient.model";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 
 @Injectable()
 export class IngredientService {
@@ -37,5 +37,25 @@ export class IngredientService {
         return await this.ingredientRepository.findByIdAndDelete(id, {
             new: true
         });
+    }
+
+    public async receiveIdRecipe(id: string, idRecipe: string) {
+        return await this.ingredientRepository.findByIdAndUpdate(
+            id, {
+            $push: { recipe: new Types.ObjectId(idRecipe) },
+            new: true
+        }
+        )
+    }
+
+    public async removeIdRecipe(id: string, idRecipe: string) {
+        return await this.ingredientRepository.findByIdAndUpdate(
+            id, {
+            $pull: { recipe: new Types.ObjectId(idRecipe)},
+            new: true,
+            safe: true,
+            multi: false
+        
+        })
     }
 }

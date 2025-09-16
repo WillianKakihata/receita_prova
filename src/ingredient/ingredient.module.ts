@@ -9,5 +9,7 @@ import { IngredientController } from './controller/ingredient.controller';
   imports: [MongooseModule.forFeature([{ name: Ingredient.name, schema: ingredientsSchema }])],
   controllers: [IngredientController],
   providers: [IngredientService],
+  exports: [IngredientService]
+
 })
 export class IngredientModule {}

@@ -3,10 +3,13 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { Recipe } from "../model/recipe.model";
 import { CreateRecipeDto } from "../dto/create.recipe.dto";
+import { IngredientService } from "src/ingredient/service/ingredients.service";
 
 @Injectable()
 export class RecipeService {
-    constructor(@InjectModel(Recipe.name) private recipeRepository: Model<Recipe>) { }
+    constructor(
+        @InjectModel(Recipe.name) private recipeRepository: Model<Recipe>,
+        private readonly IngredientService: IngredientService) { }
 
     public async create(createRecipe: CreateRecipeDto): Promise<Recipe> {
         console.log(createRecipe.ingredients);
@@ -42,22 +45,24 @@ export class RecipeService {
     }
 
     public async addIngredients(id: string, idIngredient: string) {
-        return await this.recipeRepository.findByIdAndUpdate(
+        await this.IngredientService.receiveIdRecipe(idIngredient, id)
+        const ingredient = await this.recipeRepository.findByIdAndUpdate(
             id, {
-                $push: {ingredientsId: new Types.ObjectId(idIngredient)},
-                new: true
-            }
-        )
+            $push: { ingredientsId: new Types.ObjectId(idIngredient) },
+            new: true
+        })
+        await this.IngredientService.receiveIdRecipe(idIngredient, id)
+        return ingredient;
     }
 
     public async removeIngredients(id: string, idIngredient: string) {
-        return await this.recipeRepository.findByIdAndUpdate(
+        await this.IngredientService.removeIdRecipe(idIngredient, id)
+        const remove = await this.recipeRepository.findByIdAndUpdate(
             id, {
-                $pull: {ingredientsId: new Types.ObjectId(idIngredient)},
-                new: true,
-                safe: true, 
-                multi: false 
-            }
-        )
+            $pull: { ingredientsId: new Types.ObjectId(idIngredient) },
+            new: true,
+            safe: true,
+            multi: false
+        })
     }
 }
